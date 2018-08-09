@@ -1,0 +1,26 @@
+function LeftImpactConstraints(nlp, src, tar, bounds, varargin)
+    plant = nlp.Plant;
+    
+    % no need to be time-continuous
+    removeConstraint(nlp,'tContDomain');
+    
+    % first call the class method (calling impact model since it no longer
+    % applies if we have a custom function)
+    plant.rigidImpactConstraint(nlp, src, tar, bounds, varargin{:});
+    
+    % two-step Opt, no need to back to origin !  
+    % ---- thank Ayonga, 20180517
+%     % the relabeling/periodicity of joint coordiante is no longer valid
+%     % (this only affects position peridicity, velocity still applies)
+%     removeConstraint(nlp,'xDiscreteMapLeftImpact');
+%     
+%     % Readding Periodicity (ignoring first 3 coordinates)
+%     R = plant.R;
+%     x = plant.States.x;
+%     xn = plant.States.xn;
+%     x_diff = R*x-xn;
+%     x_map = SymFunction(['xPartialDiscreteMap' plant.Name],x_diff(4:end),{x,xn});
+%     
+%     addNodeConstraint(nlp, x_map, {'x','xn'}, 'first', 0, 0, 'Linear');
+    
+end
