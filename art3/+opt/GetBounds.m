@@ -11,7 +11,7 @@ function bounds = GetBounds(model, speed, T_)
     % Width of hip_rolls
     wt = 0.23;
     vx = speed(1);
-    vy = speed(2);
+    % vy = speed(2);
     
     %% some common boundary values are defined here
     
@@ -125,13 +125,20 @@ function bounds = GetBounds(model, speed, T_)
     model_bounds.params.pposition.x0 = [model_bounds.time.t0.x0, model_bounds.time.tf.x0]';
     
     
+    % some trick for foot touchdown position
+    
+    left_foot_position_init = vx*T_;
+    left_foot_position_max = vx*T_ + 0.02;
+    left_foot_position_min = vx*T_ - 0.02;
+    
+    
     model_bounds.params.pRightPoint.lb = [0, -wt/2.0, 0]';    
     model_bounds.params.pRightPoint.ub = [0, -wt/2.0, 0]';    
     model_bounds.params.pRightPoint.x0 = [0, -wt/2.0, 0]';
     
-    model_bounds.params.pLeftPoint.lb = [0.3, wt/2.0, 0]';    
-    model_bounds.params.pLeftPoint.ub = [0.4, wt/2.0, 0]';     
-    model_bounds.params.pLeftPoint.x0 = [0.32, wt/2.0, 0]';
+    model_bounds.params.pLeftPoint.lb = [left_foot_position_min, wt/2.0, 0]';    
+    model_bounds.params.pLeftPoint.ub = [left_foot_position_max, wt/2.0, 0]';     
+    model_bounds.params.pLeftPoint.x0 = [left_foot_position_init, wt/2.0, 0]';
 
     
     %% construct the boundary values for each domain 

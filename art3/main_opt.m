@@ -5,7 +5,8 @@ clear; close all; clc;
 %restoredefaultpath; matlabrc;   % Restore search path to factory-installed state, Start up file for MATLAB program.
 
 % specify the path to the FROST
-frost_path  = '../frost-dev';
+% only for my computer you need change it
+frost_path  = '../../frost-dev';
 addpath(frost_path);
 frost_addpath; % initialize FROST
 export_path = 'gen/opt'; % path to export compiled C++ and MEX files

@@ -46,7 +46,6 @@ classdef Art3Model < RobotLinks
             %% customized the URDF
             % re-arrange the joint orders
             all_joint_names = {joints.Name};
-            disp(all_joint_names);
             nj = numel(joints);    
             indices = zeros(nj,1);
             joint_names = {
