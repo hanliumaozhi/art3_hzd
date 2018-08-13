@@ -117,7 +117,7 @@ opt.updateInitCondition(nlp,param.gait);
 
  
 %% save
-save('local/good_new_gait.mat','gait','sol','info','bounds');
+save('local/tmp_gait.mat','gait','sol','info','bounds');
 
 
 

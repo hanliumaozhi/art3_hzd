@@ -35,7 +35,7 @@ bounds = opt.GetBounds(robot, [0.8, 0],0.4);
 nlp = opt.LoadProblem(system, bounds, load_path);
 
 %% gen gait library 
-target_vx = [0.4, 0.3, 0.2, 0.1, 0, -0.1, -0.2, -0.3, -0.4];
+target_vx = [0.8, 0.6, 0.4, 0.3, 0.2, 0.1, 0, -0.1, -0.2, -0.3, -0.4, -0.6, -0.8];
 
 T = 0.4;
 subfolder_name = 'library';

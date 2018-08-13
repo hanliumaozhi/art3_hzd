@@ -1,16 +1,4 @@
 function B = bezier(t, P)
-    %Bazier curve
-    % Parameters
-    % ----------
-    % - t: double
-    %   Time between 0 and 1
-    % - C: 2-by-n double matrix
-    %   Control points
-    %
-    % Returns
-    % -------
-    % - B: 2-by-1 vector
-    %   Output point
 
     B = 0.0;
     for i = 0:5

@@ -1,6 +1,6 @@
 counter = 1;
 control_point = zeros(1, 6);
-for i = 3:4:24
+for i = 1:4:24
     control_point(counter) = gait(1).params.aposition(i);
     counter = counter + 1;
 end
