@@ -4,7 +4,7 @@ function actuated_state(nlp, node, bounds)
     domain = nlp.Plant;
     x = domain.States.x;
     dx = domain.States.dx;
-    idx = [3:9, 12:14]; 
+    idx = [6:7, 11:12]; 
     full_state = [x(idx);dx(idx)];
     % knee angle
     full_state_fun = SymFunction(['actState_',domain.Name], full_state, {x, dx});

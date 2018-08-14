@@ -2,7 +2,7 @@ function [nlp] = updateDesiredGait(nlp, sys, target_gait)
     domains = sys.Gamma.Nodes.Domain;
     
     
-    idx = [7:9, 12:14]; 
+    idx = [6:7, 11:12]; 
     for j=1:numel(domains) %% HECK!!!!!!
         domain = domains{j};
         phase_idx = getPhaseIndex(nlp,sys.Gamma.Nodes.Name{j});

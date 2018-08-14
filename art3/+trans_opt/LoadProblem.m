@@ -4,7 +4,6 @@ function nlp  = LoadProblem(system, bounds, gait, load_path)
     if nargin < 4
         load_path = [];
     end
-    
 
     num_grid.RightStance1 = 10;
     num_grid.LeftStance1 = 10;
@@ -15,7 +14,7 @@ function nlp  = LoadProblem(system, bounds, gait, load_path)
         'DistributeTimeVariable', false,...
         'DistributeParameters',false};
     
-    nlp = HybridTrajectoryOptimization('atrias_opt', system, num_grid, [], options{:});
+    nlp = HybridTrajectoryOptimization('art3_opt', system, num_grid, [], options{:});
     
     if isempty(load_path)
         nlp.configure(bounds);

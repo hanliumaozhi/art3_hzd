@@ -8,7 +8,7 @@ function LeftStance1Constraints(nlp, bounds, varargin)
     %% virtual constraints    
     opt.constraint.virtual_constraints(nlp, bounds, ip.Results.LoadPath);
     %% foot clearance
-    [right_foot_frame] = sys.frames.RightFoot(domain);
+    [right_foot_frame, ~, ~] = sys.frames.RightPoint(domain);
     opt.constraint.foot_clearance(nlp, bounds, right_foot_frame);
     
     %% swing toe position
@@ -24,9 +24,9 @@ function LeftStance1Constraints(nlp, bounds, varargin)
     %     opt.constraint.feet_distance(nlp, bounds);
     
     
-    opt.constraint.yaw_start(nlp, bounds);
+    %opt.constraint.yaw_start(nlp, bounds);
     
-    opt.constraint.knee_angle(nlp, bounds);
+    %opt.constraint.knee_angle(nlp, bounds);
     
 %     opt.constraint.average_velocity(nlp, bounds);
 

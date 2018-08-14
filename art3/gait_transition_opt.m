@@ -1,16 +1,79 @@
-start_vy_series = {[0, 0.2, 0.4, 0.6, 0.8]
+%% Setting up path
+clear; close all; clc;
+%restoredefaultpath; matlabrc;   % Restore search path to factory-installed state, Start up file for MATLAB program.
+
+% specify the path to the FROST
+% only for my computer you need change it
+frost_path  = '../../frost-dev';
+addpath(frost_path);
+frost_addpath; % initialize FROST
+export_path = 'gen/trans/opt';
+utils.init_path(export_path);
+
+load_sym  = false; % if true, it will load symbolic expression from 
+if load_sym    
+    load_path = 'gen/trans/sym'; % path to export binary Mathematica symbolic expression (MX) files
+    utils.init_path(load_path);
+else
+    load_path   = []; 
+end
+
+%% robot model settings
+cur = utils.get_root_path();
+urdf = fullfile(cur,'urdf','art3_description_new.urdf'); % Build full file name from parts 
+
+delay_set = false;
+
+%% load robot model
+% load the robot model
+robot = sys.LoadModel(urdf, load_path, delay_set);  % call  loadDynamics()
+
+% load hybrid system
+system = sys.LoadTransSystem(robot, load_path);
+
+%% Load optimization problem
+T = 0.4;
+subfolder_name = 'library';
+start_gait_file = fullfile('local', subfolder_name, 'gait_X0.0.mat');
+start_gait = load(start_gait_file);
+x0 = [start_gait.gait(1).states.x(:,11);start_gait.gait(1).states.dx(:,11)];
+
+target_gait_file = fullfile('local', subfolder_name, 'gait_X0.0.mat');
+target_gait = load(target_gait_file);
+xf = [target_gait.gait(3).states.x(:,11);target_gait.gait(3).states.dx(:,11)];
+vel_lb = [0, 0];
+vel_ub = [0, 0];
+
+bounds = trans_opt.GetBounds(robot, vel_lb, vel_ub, T, x0, xf);
+
+%%
+% load problem
+param = load('local/tmp_gait.mat');
+nlp = trans_opt.LoadProblem(system, bounds, param.gait, load_path);
+
+%% Compile stuff if needed
+compileObjective(nlp,[],[],export_path);
+compileConstraint(nlp,[],[],export_path);
+% compileConstraint(nlp,[],[],export_path);
+% % Save expression 
+
+load_path   = 'gen/trans/sym';
+utils.init_path(load_path);
+system.saveExpression(load_path); % run this after loaded the optimization problem
+
+%% work
+start_vx_series = {[0, 0.2, 0.4, 0.6, 0.8]
     [0, -0.2, -0.4, -0.6, -0.8]
     0
     0};
 % start_vy = [0, -0.2, -0.4, -0.6, -0.8];
-target_vy = [0.0];
-start_vx_series = {0
+target_vx = [0.0];
+start_vy_series = {0
     0
     [0,0.1,0.2,0.3,0.4]
     [0,-0.1,-0.2,-0.3,-0.4]};
-target_vx = [0.0];
-T = 0.4;
-subfolder_name = 'library5';
+target_vy = [0.0];
+
 if ~exist(fullfile('local', subfolder_name, 'transition'), 'dir')
     mkdir(fullfile('local', subfolder_name, 'transition'));
 end
@@ -27,10 +90,10 @@ dP_right = fit_data_right.dP;
 start_vy = [-0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8];
 start_vx = [-0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4];
 counter = 1;
-for i=1:4
+for i=1:1
     start_vy = start_vy_series{i};
     start_vx = start_vx_series{i};
-    target_gait_file = fullfile('local', subfolder_name, sprintf('gait_X%0.1f_Y%.1f.mat', target_vx, target_vy));
+    target_gait_file = fullfile('local', subfolder_name, sprintf('gait_X%0.1f.mat', target_vx));
     target_gait = load(target_gait_file);
     guess = [target_gait.gait; target_gait.gait(1:3)];
     guess(3).tspan = guess(3).tspan - guess(3).tspan(1);
@@ -50,11 +113,11 @@ for i=1:4
             
             
             
-            start_gait_file = fullfile('local', subfolder_name, sprintf('gait_X%0.1f_Y%.1f.mat', vx, vy));
+            start_gait_file = fullfile('local', subfolder_name, sprintf('gait_X%0.1f.mat', vx));
             start_gait = load(start_gait_file);
             x0 = [start_gait.gait(1).states.x(:,11);start_gait.gait(1).states.dx(:,11)];
             
-            target_gait_file = fullfile('local', subfolder_name, sprintf('gait_X%0.1f_Y%.1f.mat', target_vx, target_vy));
+            target_gait_file = fullfile('local', subfolder_name, sprintf('gait_X%0.1f.mat', target_vx));
             target_gait = load(target_gait_file);
             xf = [target_gait.gait(3).states.x(:,11);target_gait.gait(3).states.dx(:,11)];
             
@@ -74,14 +137,8 @@ for i=1:4
             trans_opt.updateDesiredGait(nlp, system, gait_cost);
             
             % update initial condition
-            
-            
-            
             trans_opt.updateInitCondition(nlp,guess);
-            
-            
-            
-            
+                        
             diary_name = fullfile('local', subfolder_name, 'transition', ...
                 sprintf('gait_X%0.1f_Y%.1f_TO_X%0.1f_Y%.1f.txt', vx, vy, target_vx, target_vy));
             diary(diary_name);
@@ -109,4 +166,4 @@ for i=1:4
         end
         
     end
-end;
+end

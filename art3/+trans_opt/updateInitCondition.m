@@ -20,8 +20,8 @@ function [nlp] = updateInitCondition(nlp, init_params)
             if ~any(ismember(nlp.Phase(i).OptVarTable.Properties.VariableNames, fields{j}))
                 continue;
             end
-
-            for k = 1:nlp.Phase(i).NumNode
+            % fix bug
+            for k = 1:size(init_params(i).inputs.(fields{j}), 2)
                 if any(size(init_params(i).inputs.(fields{j})(:,k)) ~= size(nlp.Phase(i).OptVarTable.(fields{j})(k).InitialValue))
                     continue;
                 end

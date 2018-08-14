@@ -2,17 +2,23 @@
 
 
 %% Setting up path
-clear; close all; clc;
-restoredefaultpath; matlabrc;
-
-export_path = 'gen/opt';
-load_path   = 'gen/sym';
-% load_path  = [];
+frost_path  = '../../frost-dev';
+addpath(frost_path);
+frost_addpath; % initialize FROST
+export_path = 'gen/trans/opt';
 utils.init_path(export_path);
+
+load_sym  = true; % if true, it will load symbolic expression from 
+if load_sym    
+    load_path = 'gen/trans/sym'; % path to export binary Mathematica symbolic expression (MX) files
+    utils.init_path(load_path);
+else
+    load_path   = []; 
+end
 
 %% initialize model settings
 cur = utils.get_root_path();
-urdf = fullfile(cur,'urdf','atrias.urdf');
+urdf = fullfile(cur,'urdf','art3_description_new.urdf');
 delay_set = false;
 %% load robot model
 tic
@@ -37,7 +43,7 @@ load_path   = 'gen/sym';
 system.saveExpression(load_path); % run this after loaded the optimization problem
 
 %% gait library
-param = load(fullfile('local','library5','transition','gait_X0.0_Y0.8_TO_X0.0_Y0.0_Failed.mat'));
+param = load(fullfile('local','library','transition','gait_X0.2_Y0.0_TO_X0.0_Y0.0.mat'));
 % trans_opt.updateVariableBounds(nlp, param.bounds);
 
 % checkConstraints(nlp, param.sol, 1e-3, 'local/constr.txt')

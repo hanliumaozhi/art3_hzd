@@ -4,10 +4,10 @@ function periodicity( nlp, node, bounds )
     domain = nlp.Plant;
     x = domain.States.x;
     dx = domain.States.dx;
-    idx = [7:9, 12:14]; 
     
-    
-    fs = [1; dx(1); dx(2)];
+    % detail info see plotPeriodic.m
+    idx = [6:7, 11:12]; 
+    fs = [1; x(1); dx(1)];
     
     q_fit = SymVariable('p',[length(idx),3]);
     dq_fit = SymVariable('dp',[length(idx),3]);
