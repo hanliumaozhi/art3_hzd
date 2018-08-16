@@ -1,4 +1,4 @@
-function actuated_state(nlp, node, bounds)
+    function actuated_state(nlp, node, bounds)
     % constraints for step length and step width
     
     domain = nlp.Plant;

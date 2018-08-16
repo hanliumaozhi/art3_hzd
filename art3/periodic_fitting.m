@@ -1,6 +1,6 @@
 %% Generate best fit function
 target_vy = 0.0;
-target_vx = [-0.8, -0.6, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.6, 0.8];
+target_vx = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0, -0.1, -0.2, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8];
 T = 0.4;
 subfolder_name = 'library';
 if ~exist(fullfile('local', subfolder_name, 'periodic_fitting'), 'dir')

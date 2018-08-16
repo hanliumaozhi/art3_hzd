@@ -10,7 +10,7 @@ frost_addpath; % initialize FROST
 export_path = 'gen/trans/opt';
 utils.init_path(export_path);
 
-load_sym  = false; % if true, it will load symbolic expression from 
+load_sym  = true; % if true, it will load symbolic expression from 
 if load_sym    
     load_path = 'gen/trans/sym'; % path to export binary Mathematica symbolic expression (MX) files
     utils.init_path(load_path);
@@ -87,33 +87,34 @@ P_right = fit_data_right.P;
 dP_right = fit_data_right.dP;
 % nlp.Phase(1).removeCost('stateDeviation_RightStance');
 % nlp.Phase(3).removeConstraint('periodicState_LeftStance');
-start_vy = [-0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8];
-start_vx = [-0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4];
+start_vx = [-0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8];
 counter = 1;
-for i=1:1
-    start_vy = start_vy_series{i};
-    start_vx = start_vx_series{i};
-    target_gait_file = fullfile('local', subfolder_name, sprintf('gait_X%0.1f.mat', target_vx));
-    target_gait = load(target_gait_file);
-    guess = [target_gait.gait; target_gait.gait(1:3)];
-    guess(3).tspan = guess(3).tspan - guess(3).tspan(1);
-    guess(7).tspan = guess(7).tspan - guess(7).tspan(1);
+for i=1:size(start_vx, 2)
+    start_vy = 0.0;
+    vy = 0.0;
+    %start_vx = start_vx(1, i);
     
-    for vx = start_vx
-        for vy = start_vy
+    for vx = -2:2
+        if vx ~= 0 && (i+vx <= size(start_vx, 2)) && (i+vx >= 1)
+            target_vx = start_vx(vx+i);
+            target_gait_file = fullfile('local', subfolder_name, sprintf('gait_X%0.1f.mat', target_vx));
+            target_gait = load(target_gait_file);
+            guess = [target_gait.gait; target_gait.gait(1:3)];
+            guess(3).tspan = guess(3).tspan - guess(3).tspan(1);
+            guess(7).tspan = guess(7).tspan - guess(7).tspan(1);
             
             data_name = fullfile('local', subfolder_name, 'transition', ...
-                sprintf('gait_X%0.1f_Y%.1f_TO_X%0.1f_Y%.1f.mat', vx, vy, target_vx, target_vy));
+                sprintf('gait_X%0.1f_Y%.1f_TO_X%0.1f_Y%.1f.mat', start_vx(i), 0.0, target_vx, 0.0));
             if exist(data_name, 'file')
                 continue;
             end
             
-            vel_lb = [min(vx,target_vx), min(vy,target_vy)];
-            vel_ub = [max(vx,target_vx), max(vy,target_vy)];
+            vel_lb = [min(start_vx(i), target_vx), 0.0];
+            vel_ub = [max(start_vx(i), target_vx), 0.0];
             
             
             
-            start_gait_file = fullfile('local', subfolder_name, sprintf('gait_X%0.1f.mat', vx));
+            start_gait_file = fullfile('local', subfolder_name, sprintf('gait_X%0.1f.mat', start_vx(i)));
             start_gait = load(start_gait_file);
             x0 = [start_gait.gait(1).states.x(:,11);start_gait.gait(1).states.dx(:,11)];
             
@@ -140,18 +141,18 @@ for i=1:1
             trans_opt.updateInitCondition(nlp,guess);
                         
             diary_name = fullfile('local', subfolder_name, 'transition', ...
-                sprintf('gait_X%0.1f_Y%.1f_TO_X%0.1f_Y%.1f.txt', vx, vy, target_vx, target_vy));
+                sprintf('gait_X%0.1f_Y%.1f_TO_X%0.1f_Y%.1f.txt',  start_vx(i), 0.0, target_vx, 0.0));
             diary(diary_name);
             
             [gait, sol, info, total_time] = trans_opt.solve(nlp);
             pause(1);
             if info.status == 0 || info.status == 1
                 data_name = fullfile('local', subfolder_name, 'transition', ...
-                    sprintf('gait_X%0.1f_Y%.1f_TO_X%0.1f_Y%.1f.mat', vx, vy, target_vx, target_vy));
+                    sprintf('gait_X%0.1f_Y%.1f_TO_X%0.1f_Y%.1f.mat',  start_vx(i), 0.0, target_vx, 0.0));
                 fprintf('Saving gait %s\n', data_name);
             else
                 data_name = fullfile('local', subfolder_name, 'transition', ...
-                    sprintf('gait_X%0.1f_Y%.1f_TO_X%0.1f_Y%.1f_Failed.mat', vx, vy, target_vx, target_vy));
+                    sprintf('gait_X%0.1f_Y%.1f_TO_X%0.1f_Y%.1f_Failed.mat',  start_vx(i), 0.0, target_vx, 0.0));
                 fprintf('Saving (failed) gait %s\n', data_name);
             end
             pause(0.2);
@@ -162,7 +163,6 @@ for i=1:1
             
             counter = counter + 1;
             guess = gait;
-            
         end
         
     end
