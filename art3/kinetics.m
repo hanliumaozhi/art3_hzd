@@ -59,3 +59,16 @@ for i = 1:21
     
     robot_state_var(i, 1) = (r_hip_p_x - r_ankle_x);
 end
+
+%% save expression
+r_hip_p_frame = robot.Joints(getJointIndices(robot, 'r_hip_pitch'));
+r_hip_p_p = getCartesianPosition(robot, r_hip_p_frame);
+
+r_ankle_frame = robot.FB3_Points.r_FB3;
+r_ankle = getCartesianPosition(robot, r_ankle_frame);
+
+p_to_right_bottom = SymFunction('p_to_right_bottom', r_ankle, robot.States.x);
+
+my_export_path = 'gen/test_export';
+utils.init_path(my_export_path);
+export(p_to_right_bottom, my_export_path)
