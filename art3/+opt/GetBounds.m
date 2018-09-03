@@ -105,12 +105,12 @@ function bounds = GetBounds(model, speed, T_)
 
     % start swing foot velocity, pos vel
     % (Make sure foot goes upward)
-    model_bounds.constrBounds.footVelocityBeginning.lb = [ -5, 0, 0]';
-    model_bounds.constrBounds.footVelocityBeginning.ub = [ 5, 0, 10]';
+    model_bounds.constrBounds.footVelocityBeginning.lb = [ -0.2, 0, 0]';
+    model_bounds.constrBounds.footVelocityBeginning.ub = [ 0.2, 0, 0.3]';
     % impact swing foot velocity, pos vel
     % (Make sure foot goes downward and slightly backward)    
-    model_bounds.constrBounds.footVelocityEnd.lb = [ -5, 0, -10]';
-    model_bounds.constrBounds.footVelocityEnd.ub = [ 5, 0, -0]';
+    model_bounds.constrBounds.footVelocityEnd.lb = [ -0.2, 0, -0.25]';
+    model_bounds.constrBounds.footVelocityEnd.ub = [ 0.2, 0, -0.05]';
     
 
     %%% Common Virtual Constraints
@@ -120,25 +120,34 @@ function bounds = GetBounds(model, speed, T_)
     model_bounds.params.aposition.ub = 100*ones(6*4,1);
     model_bounds.params.aposition.x0 = zeros(6*4,1);
     % phase paramaters for virtual constraints "position"
-    model_bounds.params.pposition.lb = [model_bounds.time.t0.lb, model_bounds.time.tf.lb]'; 
-    model_bounds.params.pposition.ub = [model_bounds.time.t0.ub, model_bounds.time.tf.ub]';   
-    model_bounds.params.pposition.x0 = [model_bounds.time.t0.x0, model_bounds.time.tf.x0]';
+%     model_bounds.params.pposition.lb = [model_bounds.time.t0.lb, model_bounds.time.tf.lb]'; 
+%     model_bounds.params.pposition.ub = [model_bounds.time.t0.ub, model_bounds.time.tf.ub]';   
+%     model_bounds.params.pposition.x0 = [model_bounds.time.t0.x0, model_bounds.time.tf.x0]';
     
+    if vx >= 0
+        model_bounds.params.pposition.lb = [-2*T_*vx, 0*vx]';
+        model_bounds.params.pposition.ub = [T_*vx, 2*T_*vx]';
+        model_bounds.params.pposition.x0 = [-0.5*T_*vx, 0.5*T_*vx]';
+    else
+        model_bounds.params.pposition.ub = [-T_*vx, 0*vx]';
+        model_bounds.params.pposition.lb = [0*vx, T_*vx]';
+        model_bounds.params.pposition.x0 = [-0.5*T_*vx, 0.5*T_*vx]';
+    end
     
     % some trick for foot touchdown position
     
-    left_foot_position_init = vx*T_;
-    left_foot_position_max = vx*T_ + 0.02;
-    left_foot_position_min = vx*T_ - 0.02;
+%     left_foot_position_init = vx*T_;
+%     left_foot_position_max = vx*T_ + 0.02;
+%     left_foot_position_min = vx*T_ - 0.02;
     
     
     model_bounds.params.pRightPoint.lb = [0, -wt/2.0, 0]';    
     model_bounds.params.pRightPoint.ub = [0, -wt/2.0, 0]';    
     model_bounds.params.pRightPoint.x0 = [0, -wt/2.0, 0]';
     
-    model_bounds.params.pLeftPoint.lb = [left_foot_position_min, wt/2.0, 0]';    
-    model_bounds.params.pLeftPoint.ub = [left_foot_position_max, wt/2.0, 0]';     
-    model_bounds.params.pLeftPoint.x0 = [left_foot_position_init, wt/2.0, 0]';
+    model_bounds.params.pLeftPoint.lb = [-0.1, wt/2.0, 0]';    
+    model_bounds.params.pLeftPoint.ub = [1, wt/2.0, 0]';     
+    model_bounds.params.pLeftPoint.x0 = [vx*T_, wt/2.0, 0]';
 
     
     %% construct the boundary values for each domain 

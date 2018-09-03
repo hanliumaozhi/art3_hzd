@@ -27,7 +27,7 @@ delay_set = true;
 % time by 7-10 faster. 
 % Set it to false for the first time, and save expressions after loaded the
 % model. 
-load_sym  = false; % if true, it will load symbolic expression from 
+load_sym  = true; % if true, it will load symbolic expression from 
 if load_sym    
     load_path   = 'gen/sym'; % path to export binary Mathematica symbolic expression (MX) files
     utils.init_path(load_path);
@@ -101,7 +101,7 @@ opt.updateVariableBounds(nlp, bounds);
 
 
 %% update initial condition if use pre-existing gaits
-param = load('local/tmp_gait.mat');
+param = load('local/library/gait_X0.8.mat');
 opt.updateInitCondition(nlp,param.gait);
 
 
@@ -113,16 +113,15 @@ opt.updateInitCondition(nlp,param.gait);
 % 3. warm start using use existing solutoin as the initial guess
 %[gait, sol, info] = opt.solve(nlp, sol, info); % if use previous solution "sol"
 [gait, sol, info] = opt.solve(nlp);
- 
 
  
 %% save
-save('local/tmp_gait.mat','gait','sol','info','bounds');
+save('local/state_base_gait.mat','gait','sol','info','bounds');
 
 
 
 %% animation
-anim = plot.LoadOptAnimator(robot, gait,'SkipExporting', false); % set 'SkipExporting' = false, only for the first time!
+anim = plot.LoadOptAnimator(robot, gait,'SkipExporting', true); % set 'SkipExporting' = false, only for the first time!
 
 
 

@@ -57,10 +57,20 @@ function domain = LeftStance(model, load_path)
     %     p = SymVariable('p',[2,1]);
     %     tau = (deltaPhip-p(2))/(p(1)-p(2));
     
-    % @time based phase variable
-    t = SymVariable('t');
+    l_hip_frame = domain.Joints(getJointIndices(domain,'l_hip_pitch'));
+    p_lhp = getCartesianPosition(domain, l_hip_frame);
+    p_lf = getCartesianPosition(domain, left_foot);
+    p_hip = p_lhp(1) - p_lf(1);
+    deltaPhip = linearize(p_hip,x);
+    
+    % @state based phase variable
     p = SymVariable('p',[2,1]);
-    tau = (t-p(1))/(p(2)-p(1));
+    tau = (deltaPhip-p(1))/(p(2)-p(1));
+        
+    % @time based phase variable
+%     t = SymVariable('t');
+%     p = SymVariable('p',[2,1]);
+%     tau = (t-p(1))/(p(2)-p(1));
     
     
     % relative degree two outputs:
@@ -81,7 +91,7 @@ function domain = LeftStance(model, load_path)
         'RightKneePitch'};
     
     y2 = VirtualConstraint(domain,ya_2,'position','DesiredType','Bezier','PolyDegree',5,...
-        'RelativeDegree',2,'OutputLabel',{y2_label},'PhaseType','TimeBased',...
+        'RelativeDegree',2,'OutputLabel',{y2_label},'PhaseType','StateBased',...
         'PhaseVariable',tau,'PhaseParams',p,'Holonomic',true,'LoadPath',load_path);
     
     
