@@ -124,15 +124,9 @@ function bounds = GetBounds(model, speed, T_)
 %     model_bounds.params.pposition.ub = [model_bounds.time.t0.ub, model_bounds.time.tf.ub]';   
 %     model_bounds.params.pposition.x0 = [model_bounds.time.t0.x0, model_bounds.time.tf.x0]';
     
-    if vx >= 0
-        model_bounds.params.pposition.lb = [-2*T_*vx, 0*vx]';
-        model_bounds.params.pposition.ub = [T_*vx, 2*T_*vx]';
-        model_bounds.params.pposition.x0 = [-0.5*T_*vx, 0.5*T_*vx]';
-    else
-        model_bounds.params.pposition.ub = [-T_*vx, 0*vx]';
-        model_bounds.params.pposition.lb = [0*vx, T_*vx]';
-        model_bounds.params.pposition.x0 = [-0.5*T_*vx, 0.5*T_*vx]';
-    end
+model_bounds.params.pposition.lb = [-2*T_*vx, 0*vx]';
+model_bounds.params.pposition.ub = [T_*vx, 2*T_*vx]';
+model_bounds.params.pposition.x0 = [-0.5*T_*vx, 0.5*T_*vx]';
     
     % some trick for foot touchdown position
     

@@ -27,7 +27,7 @@ delay_set = true;
 % time by 7-10 faster. 
 % Set it to false for the first time, and save expressions after loaded the
 % model. 
-load_sym  = true; % if true, it will load symbolic expression from 
+load_sym  = false; % if true, it will load symbolic expression from 
 if load_sym    
     load_path   = 'gen/sym'; % path to export binary Mathematica symbolic expression (MX) files
     utils.init_path(load_path);
@@ -116,7 +116,7 @@ opt.updateInitCondition(nlp,param.gait);
 
  
 %% save
-save('local/state_base_gait.mat','gait','sol','info','bounds');
+save('local/state_based_gait.mat','gait','sol','info','bounds');
 
 
 

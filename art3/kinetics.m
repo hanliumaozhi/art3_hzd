@@ -44,20 +44,23 @@ system = sys.LoadSystem(robot, load_path);
 r_hip_p_frame = robot.Joints(getJointIndices(robot, 'r_hip_pitch'));
 r_hip_p_p = getCartesianPosition(robot, r_hip_p_frame);
 
-r_ankle_frame = robot.FB3_Points.r_FB3;
-r_ankle = getCartesianPosition(robot, r_ankle_frame);
+[right_foot, fric_coef,geometry] = sys.frames.RightPoint(robot);
+r_ankle = getCartesianPosition(robot, right_foot);
 
+p_hip = r_hip_p_p(1) - r_ankle(1);
+deltaPhip = linearize(p_hip, robot.States.x);
+    
 robot_state_var = ones(21, 1);
 
 for i = 1:21
     xx = gait(1).states.x(:, i);
-    r_hip_p_x = double(subs(r_hip_p_p, robot.States.x, xx));
-    r_hip_p_x = r_hip_p_x(1);
+    %r_hip_p_x = double(subs(r_hip_p_p, robot.States.x, xx));
+    %r_hip_p_x = r_hip_p_x(1);
     
-    r_ankle_x = double(subs(r_ankle, robot.States.x, xx));
-    r_ankle_x = r_ankle_x(1);
+    %r_ankle_x = double(subs(r_ankle, robot.States.x, xx));
+    %r_ankle_x = r_ankle_x(1);
     
-    robot_state_var(i, 1) = (r_hip_p_x - r_ankle_x);
+    robot_state_var(i, 1) = double(subs(deltaPhip, robot.States.x, xx));
 end
 
 %% save expression
@@ -72,3 +75,11 @@ p_to_right_bottom = SymFunction('p_to_right_bottom', r_ankle, robot.States.x);
 my_export_path = 'gen/test_export';
 utils.init_path(my_export_path);
 export(p_to_right_bottom, my_export_path)
+
+%% bezier test
+cof = [-0.371200120728667 -0.524298966816189 -0.413251057605865 0.261484219757375 0.337539149440269 -10.129426872777753];
+
+y_val = zeros(21, 1);
+for i = 1:21
+    y_val(i) = bezier((robot_state_var(i)/0.4), cof);
+end
